@@ -1,11 +1,9 @@
 package ogenn
 
 import (
-	"testing"
-
-	"git.restpa.com/packages/golang/n.git"
-
+	"github.com/agrides/n"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 // Test struct
@@ -114,6 +112,37 @@ func TestTo_Struct(t *testing.T) {
 
 	assert.True(t, dst.IsValid())
 	assert.Equal(t, "test", dst.Value.Name)
+}
+
+func TestFrom_Valid(t *testing.T) {
+	src := n.New("hello", true)
+	dst := From(src, &n.Null[string]{})
+
+	assert.True(t, dst.IsValid())
+	assert.Equal(t, "hello", dst.Value)
+}
+
+func TestFrom_Null(t *testing.T) {
+	src := n.New(42, false)
+	dst := From(src, &n.Null[int]{})
+
+	assert.True(t, dst.IsNull())
+}
+
+func TestFrom_NilStringToNull(t *testing.T) {
+	src := NewNilString("abc")
+	dst := From(src, &n.Null[string]{})
+
+	assert.True(t, dst.IsValid())
+	assert.Equal(t, "abc", dst.Value)
+}
+
+func TestFrom_ReturnsSetter(t *testing.T) {
+	src := n.New(true, true)
+	result := From(src, &n.Null[bool]{})
+
+	assert.True(t, result.IsValid())
+	assert.True(t, result.Value)
 }
 
 func TestTo_OverwriteValidWithNull(t *testing.T) {

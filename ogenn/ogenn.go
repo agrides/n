@@ -17,3 +17,8 @@ func To[T any, G getter[T], S setter[T]](in G, out S) {
 	}
 	out.SetToNull()
 }
+
+func From[T any, G getter[T], S setter[T]](in G, out S) S {
+	To(in, out)
+	return out
+}
