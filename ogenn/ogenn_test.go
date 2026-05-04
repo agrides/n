@@ -145,6 +145,41 @@ func TestFrom_ReturnsSetter(t *testing.T) {
 	assert.True(t, result.Value)
 }
 
+func TestInto_Valid(t *testing.T) {
+	src := n.New("hello", true)
+	dst := Into[NilString, string](src)
+
+	assert.False(t, dst.IsNull())
+	assert.Equal(t, "hello", dst.Value)
+}
+
+func TestInto_Null(t *testing.T) {
+	src := n.New("hello", false)
+	dst := Into[NilString, string](src)
+
+	assert.True(t, dst.IsNull())
+}
+
+func TestInto_ToNullType(t *testing.T) {
+	src := n.New(42, true)
+	dst := Into[n.Null[int], int](src)
+
+	assert.True(t, dst.IsValid())
+	assert.Equal(t, 42, dst.Value)
+}
+
+func TestInto_Struct(t *testing.T) {
+	type Item struct {
+		Name string
+	}
+
+	src := n.New(Item{Name: "test"}, true)
+	dst := Into[n.Null[Item], Item](src)
+
+	assert.True(t, dst.IsValid())
+	assert.Equal(t, "test", dst.Value.Name)
+}
+
 func TestTo_OverwriteValidWithNull(t *testing.T) {
 	src := n.New(0, false)
 	dst := n.New(100, true)
